@@ -1,0 +1,1571 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MotoGo - Báo cáo Mini Project Frontend</title>
+    <!-- Font Inter & Google Material Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ==========================================================================
+           1. RESET & VARIABLES
+           ========================================================================== */
+        :root {
+            --primary: #0052CC;
+            --primary-dark: #003B99;
+            --primary-light: #DEEBFF;
+            --secondary: #00B8D9;
+            --secondary-light: #E6FCFF;
+            --accent: #FFAB00;
+            --dark: #091E42;
+            --dark-surface: #172B4D;
+            --gray-bg: #F4F5F7;
+            --gray-card: #FFFFFF;
+            --text-main: #172B4D;
+            --text-sub: #5E6C84;
+            --text-white: #FFFFFF;
+            --border-color: #EBECF0;
+            --shadow-sm: 0 2px 4px rgba(9, 30, 66, 0.08);
+            --shadow-md: 0 8px 16px rgba(9, 30, 66, 0.12);
+            --shadow-lg: 0 16px 32px rgba(9, 30, 66, 0.16);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 20px;
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: #050B14;
+            color: var(--text-main);
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* ==========================================================================
+           2. VIEWPORT & CONTAINER (16:9 RATIO)
+           ========================================================================== */
+        .presentation-stage {
+            width: 100vw;
+            height: 100vh;
+            max-width: 177.78vh; /* Force 16:9 aspect ratio max size */
+            max-height: 56.25vw;
+            position: relative;
+            background-color: var(--gray-bg);
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top Bar Controls */
+        .top-navbar {
+            height: 50px;
+            background: var(--dark);
+            color: var(--text-white);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            z-index: 100;
+            user-select: none;
+        }
+
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: var(--text-white);
+            letter-spacing: -0.5px;
+        }
+
+        .brand-logo svg {
+            fill: var(--secondary);
+            width: 24px;
+            height: 24px;
+        }
+
+        .brand-badge {
+            background: rgba(255, 255, 255, 0.15);
+            color: var(--secondary);
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: var(--text-white);
+            padding: 6px 12px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: var(--transition);
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            color: #ffffff;
+        }
+
+        /* Slide View Area */
+        .slides-wrapper {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+            height: calc(100% - 100px);
+        }
+
+        .slide {
+            position: absolute !important;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            visibility: hidden;
+            transform: scale(0.96) translateX(30px);
+            transition: opacity 0.4s ease, transform 0.4s ease, visibility 0.4s;
+            padding: 40px 60px;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--gray-bg);
+            overflow-y: auto;
+        }
+
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+            transform: scale(1) translateX(0);
+            z-index: 10;
+        }
+
+        .slide.prev {
+            transform: scale(0.96) translateX(-30px);
+        }
+
+        /* Footer Navigation Bar */
+        .bottom-navbar {
+            height: 50px;
+            background: #ffffff;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            z-index: 100;
+            user-select: none;
+        }
+
+        .slide-counter {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text-sub);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .slide-counter span.current {
+            color: var(--primary);
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .ctrl-btn {
+            background: var(--primary-light);
+            color: var(--primary);
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .ctrl-btn:hover:not(:disabled) {
+            background: var(--primary);
+            color: var(--text-white);
+            transform: translateY(-2px);
+        }
+
+        .ctrl-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .progress-bar-container {
+            position: absolute;
+            bottom: 50px;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: rgba(0, 0, 0, 0.05);
+            z-index: 90;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            transition: width 0.3s ease;
+        }
+
+        /* ==========================================================================
+           3. TYPOGRAPHY & COMMON COMPONENTS
+           ========================================================================== */
+        .slide-header {
+            margin-bottom: 24px;
+        }
+
+        .slide-subtitle {
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 1.5px;
+            font-weight: 700;
+            color: var(--secondary);
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .slide-title {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--dark);
+            line-height: 1.25;
+            letter-spacing: -0.5px;
+        }
+
+        .slide-title span {
+            color: var(--primary);
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            flex: 1;
+            align-items: center;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            flex: 1;
+        }
+
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            flex: 1;
+        }
+
+        .grid-5 {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 12px;
+            flex: 1;
+        }
+
+        .card-compact {
+            padding: 16px 14px;
+        }
+
+        .card-compact .card-title {
+            font-size: 0.95rem;
+            margin-bottom: 6px;
+        }
+
+        .card-compact .card-text {
+            font-size: 0.78rem;
+            line-height: 1.4;
+        }
+
+        .card {
+            background: var(--gray-card);
+            border-radius: var(--radius-md);
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-md);
+            border-color: rgba(0, 82, 204, 0.2);
+        }
+
+        .card-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--radius-sm);
+            background: var(--primary-light);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+            font-size: 1.5rem;
+        }
+
+        .card-icon.secondary {
+            background: var(--secondary-light);
+            color: var(--secondary);
+        }
+
+        .card-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 10px;
+        }
+
+        .card-text {
+            font-size: 0.9rem;
+            color: var(--text-sub);
+            line-height: 1.5;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .badge-primary { background: var(--primary-light); color: var(--primary); }
+        .badge-secondary { background: var(--secondary-light); color: var(--secondary); }
+        .badge-accent { background: #FFF0B3; color: #172B4D; }
+
+        /* Icon SVG Styling */
+        .icon-svg {
+            width: 24px;
+            height: 24px;
+            fill: currentColor;
+        }
+
+        /* ==========================================================================
+           4. SLIDE SPECIFIC CUSTOM STYLES
+           ========================================================================== */
+        
+        /* Slide 1: Cover */
+        .slide-cover {
+            background: linear-gradient(135deg, var(--dark) 0%, var(--dark-surface) 100%);
+            color: var(--text-white);
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        /* Slide Closing */
+        .slide-closing {
+            background: linear-gradient(135deg, #0052CC 0%, #091E42 100%) !important;
+            color: var(--text-white) !important;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .slide-cover::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0, 184, 217, 0.1) 0%, rgba(0, 0, 0, 0) 60%);
+            pointer-events: none;
+        }
+
+        .cover-content {
+            max-width: 850px;
+            z-index: 2;
+        }
+
+        .cover-tag {
+            background: rgba(0, 184, 217, 0.15);
+            color: var(--secondary);
+            border: 1px solid rgba(0, 184, 217, 0.3);
+            padding: 6px 16px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 20px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .cover-title {
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: #ffffff;
+            line-height: 1.15;
+            margin-bottom: 16px;
+        }
+
+        .cover-title span {
+            background: linear-gradient(90deg, #00B8D9, #0052CC);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .cover-desc {
+            font-size: 1.2rem;
+            color: #A5ADBA;
+            margin-bottom: 36px;
+            line-height: 1.6;
+        }
+
+        .cover-meta {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 24px;
+            font-size: 0.9rem;
+            color: #DFE1E6;
+        }
+
+        .cover-meta item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Slide 2: Problem */
+        .problem-card {
+            border-left: 4px solid #DE350B;
+            background: #FFF5F5;
+        }
+        .problem-card .card-icon {
+            background: #FFEBE6;
+            color: #DE350B;
+        }
+
+        /* Flow Process Diagrams (Slide 7, 8) */
+        .process-flow {
+            display: flex;
+            align-items: stretch;
+            gap: 12px;
+            margin-top: 10px;
+            flex: 1;
+        }
+
+        .flow-step {
+            flex: 1;
+            background: var(--gray-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 20px 16px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .flow-step-num {
+            width: 28px;
+            height: 28px;
+            background: var(--primary);
+            color: white;
+            font-weight: 700;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            margin-bottom: 12px;
+        }
+
+        .flow-step-title {
+            font-weight: 700;
+            color: var(--dark);
+            font-size: 0.95rem;
+            margin-bottom: 6px;
+        }
+
+        .flow-step-desc {
+            font-size: 0.8rem;
+            color: var(--text-sub);
+            line-height: 1.4;
+        }
+
+        .flow-arrow {
+            display: flex;
+            align-items: center;
+            color: var(--text-sub);
+            font-size: 1.2rem;
+        }
+
+        /* Business Rules Grid (Slide 9) */
+        .rule-item {
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+            padding: 16px;
+            background: #ffffff;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-color);
+        }
+
+        .rule-icon {
+            background: var(--secondary-light);
+            color: var(--secondary);
+            padding: 10px;
+            border-radius: 50%;
+            display: flex;
+        }
+
+        .rule-content h4 {
+            font-size: 0.95rem;
+            color: var(--dark);
+            margin-bottom: 4px;
+        }
+
+        .rule-content p {
+            font-size: 0.85rem;
+            color: var(--text-sub);
+        }
+
+        /* Metric Highlights (Slide 11) */
+        .metric-card {
+            background: #ffffff;
+            border-radius: var(--radius-md);
+            padding: 24px;
+            text-align: center;
+            border-top: 4px solid var(--primary);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .metric-number {
+            font-size: 2.8rem;
+            font-weight: 800;
+            color: var(--primary);
+            line-height: 1;
+            margin: 12px 0 8px 0;
+        }
+
+        .metric-label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .metric-sub {
+            font-size: 0.8rem;
+            color: var(--text-sub);
+            margin-top: 4px;
+        }
+
+        /* Technical Architecture Grid (Slide 10) */
+        .tech-box {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 20px;
+        }
+        .tech-box h3 {
+            font-size: 1rem;
+            color: var(--primary);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .tech-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .tech-tag {
+            background: var(--gray-bg);
+            border: 1px solid var(--border-color);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        /* Stat Banner (Slide 2) */
+        .stat-banner {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-top: 14px;
+        }
+        .stat-pill {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: var(--shadow-sm);
+        }
+        .stat-pill-num {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: #DE350B;
+            line-height: 1;
+            white-space: nowrap;
+        }
+        .stat-pill-label {
+            font-size: 0.75rem;
+            color: var(--text-main);
+            font-weight: 600;
+            line-height: 1.3;
+        }
+
+        /* State Lifecycle (Slide 10) */
+        .state-flow {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 10px;
+            flex: 1;
+            align-items: stretch;
+            margin-top: 10px;
+        }
+        .state-box {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 16px 12px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: var(--shadow-sm);
+            border-top: 3px solid var(--primary);
+        }
+        .state-num {
+            display: inline-block;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--primary);
+            background: var(--primary-light);
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            width: fit-content;
+        }
+        .state-name {
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 6px;
+        }
+        .state-desc {
+            font-size: 0.75rem;
+            color: var(--text-sub);
+            line-height: 1.35;
+        }
+        .state-condition {
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px dashed var(--border-color);
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--secondary);
+        }
+
+        /* Sprint & Clarification (Slide 11) */
+        .sprint-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .sprint-row {
+            display: flex;
+            align-items: center;
+            background: #ffffff;
+            padding: 8px 12px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-color);
+            gap: 10px;
+        }
+        .sprint-tag {
+            background: var(--primary-light);
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 0.75rem;
+            padding: 3px 6px;
+            border-radius: 4px;
+            white-space: nowrap;
+        }
+        .sprint-detail {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        .clarify-card {
+            background: #FFFDF5;
+            border: 1px solid #FFE380;
+            border-left: 4px solid var(--accent);
+            padding: 8px 12px;
+            border-radius: var(--radius-sm);
+            margin-bottom: 8px;
+        }
+        .clarify-q {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 2px;
+        }
+        .clarify-a {
+            font-size: 0.75rem;
+            color: var(--text-sub);
+        }
+
+        /* Drawer Overview Panel */
+        .overview-drawer {
+            position: absolute;
+            top: 50px;
+            right: -320px;
+            width: 320px;
+            height: calc(100% - 100px);
+            background: #ffffff;
+            box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15);
+            z-index: 200;
+            transition: right 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .overview-drawer.open {
+            right: 0;
+        }
+
+        .drawer-header {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 700;
+        }
+
+        .drawer-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px;
+        }
+
+        .thumb-item {
+            padding: 10px 12px;
+            border-radius: var(--radius-sm);
+            margin-bottom: 8px;
+            cursor: pointer;
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .thumb-item:hover, .thumb-item.active {
+            background: var(--primary-light);
+            border-color: var(--primary);
+        }
+
+        .thumb-num {
+            font-weight: 700;
+            font-size: 0.8rem;
+            color: var(--primary);
+            width: 20px;
+        }
+
+        .thumb-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--dark);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Keyboard Hints Toast */
+        .kbd-hint {
+            position: absolute;
+            bottom: 60px;
+            right: 20px;
+            background: rgba(9, 30, 66, 0.8);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            pointer-events: none;
+            opacity: 0.8;
+            z-index: 80;
+        }
+        kbd {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: inherit;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="presentation-stage" id="stage">
+        <!-- TOP CONTROL BAR -->
+        <header class="top-navbar">
+            <div class="brand-logo">
+                <svg viewBox="0 0 24 24"><path d="M19 7h-3V6a3 3 0 0 0-3-3h-2a3 3 0 0 0-3 3v1H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2zm-8-1a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v1h-4V6zm-2 7a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm8 0a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/></svg>
+                MOTOGO
+                <span class="brand-badge">Mini Project</span>
+            </div>
+            <div class="nav-actions">
+                <button class="nav-btn" id="btn-toggle-overview">
+                    <svg class="icon-svg" viewBox="0 0 24 24"><path d="M4 8h4V4H4v4zm6 12h4v-4h-4v4zm-6 0h4v-4H4v4zm0-6h4v-4H4v4zm6 0h4v-4h-4v4zm6-10v4h4V4h-4zm-6 4h4V4h-4v4zm6 6h4v-4h-4v4zm0 6h4v-4h-4v4z"/></svg>
+                    Danh mục Slide
+                </button>
+                <button class="nav-btn" id="btn-fullscreen">
+                    <svg class="icon-svg" viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+                    Toàn màn hình
+                </button>
+            </div>
+        </header>
+
+        <!-- SLIDES CONTENT AREA -->
+        <main class="slides-wrapper" id="slides-container">
+            
+            <!-- SLIDE 1: TRANG BÌA -->
+            <section class="slide slide-cover active" data-slide="1">
+                <div class="cover-content">
+                    <span class="cover-tag">Frontend Mini Project Presentation</span>
+                    <h1 class="cover-title">MotoGo — <span>Nền Tảng Cho Thuê Xe Máy Tự Lái</span></h1>
+                    <p class="cover-desc">Giải pháp công nghệ kết nối khách du lịch và cửa hàng cho thuê xe máy uy tín tại Vũng Tàu & Đà Nẵng</p>
+                    <div class="cover-meta">
+                        <div class="item"><strong>Sinh viên thực hiện:</strong> Nhóm 4 Đẹp Trai</div>
+                        <div class="item"><strong>Môn học:</strong> Agile Scrum</div>
+                        <div class="item"><strong>Công nghệ:</strong> HTML5, CSS3, Vanilla JS</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SLIDE 2: BỐI CẢNH & VẤN ĐỀ THỰC TẾ -->
+            <section class="slide" data-slide="2">
+                <div class="slide-header">
+                    <span class="slide-subtitle">01. Bối cảnh thị trường</span>
+                    <h2 class="slide-title">Vì Sao Thị Trường Cần <span>MotoGo</span>?</h2>
+                </div>
+                <div class="grid-3" style="flex: none; margin-bottom: 12px;">
+                    <div class="card problem-card" style="padding: 18px;">
+                        <div class="card-icon" style="margin-bottom: 10px; width: 40px; height: 40px;">
+                            <svg class="icon-svg" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+                        </div>
+                        <h3 class="card-title" style="font-size: 1rem; margin-bottom: 6px;">Thiếu Minh Bạch Giá & Xe</h3>
+                        <p class="card-text" style="font-size: 0.82rem;">Hỏi giá thủ công qua MXH, báo giá miệng dễ đổi, tình trạng xe cũ không rõ ràng tiềm ẩn nguy hiểm.</p>
+                    </div>
+                    <div class="card problem-card" style="padding: 18px;">
+                        <div class="card-icon" style="margin-bottom: 10px; width: 40px; height: 40px;">
+                            <svg class="icon-svg" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+                        </div>
+                        <h3 class="card-title" style="font-size: 1rem; margin-bottom: 6px;">Rủi Ro Giữ Giấy Tờ Gốc</h3>
+                        <p class="card-text" style="font-size: 0.82rem;">Bắt khách để lại CCCD gốc gây tâm lý e ngại; cửa hàng ghi chép sổ tay dễ nhận trùng đơn.</p>
+                    </div>
+                    <div class="card problem-card" style="padding: 18px;">
+                        <div class="card-icon" style="margin-bottom: 10px; width: 40px; height: 40px;">
+                            <svg class="icon-svg" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7 12h-2v-2h2v2zm0-4h-2V6h2v4z"/></svg>
+                        </div>
+                        <h3 class="card-title" style="font-size: 1rem; margin-bottom: 6px;">Tranh Chấp Vết Trầy Xước</h3>
+                        <p class="card-text" style="font-size: 0.82rem;">Không có biên bản giao nhận chuẩn hóa kèm ảnh chụp hiện trạng dẫn tới cãi cọ lúc trả xe.</p>
+                    </div>
+                </div>
+                <!-- Stat Banner Khảo Sát Thực Tế -->
+                <div class="stat-banner">
+                    <div class="stat-pill">
+                        <div class="stat-pill-num">47'</div>
+                        <div class="stat-pill-label">Thời gian hỏi & chốt đơn thủ công hiện tại</div>
+                    </div>
+                    <div class="stat-pill">
+                        <div class="stat-pill-num">58%</div>
+                        <div class="stat-pill-label">Cửa hàng từng nhận trùng 2 đơn cùng khung giờ</div>
+                    </div>
+                    <div class="stat-pill">
+                        <div class="stat-pill-num">64%</div>
+                        <div class="stat-pill-label">Khách e ngại việc phải để lại CCCD gốc</div>
+                    </div>
+                    <div class="stat-pill">
+                        <div class="stat-pill-num" style="color: var(--primary);">72%</div>
+                        <div class="stat-pill-label">Khách chốt ngay nếu biết chắc xe còn trống</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SLIDE 3: MỤC TIÊU & GIẢI PHÁP -->
+            <section class="slide" data-slide="3">
+                <div class="slide-header">
+                    <span class="slide-subtitle">02. Giải pháp</span>
+                    <h2 class="slide-title">Mục Tiêu & Giá Trị Từ <span>MotoGo</span></h2>
+                </div>
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="card-icon">
+                            <svg class="icon-svg" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                        </div>
+                        <h3 class="card-title">Cho Khách Du Lịch (Renter)</h3>
+                        <ul style="list-style: none; font-size: 0.9rem; color: var(--text-sub); line-height: 1.8;">
+                            <li>✓ Đặt xe trực tuyến dễ dàng trong <strong>dưới 5 phút</strong>.</li>
+                            <li>✓ Minh bạch giá thuê, xem trước hình ảnh thật & đánh giá khách trước.</li>
+                            <li>✓ An tâm cọc tiền qua nền tảng trung gian bảo vệ quyền lợi.</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon secondary">
+                            <svg class="icon-svg" viewBox="0 0 24 24"><path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4V8h16v10zm-2-1h-6v-2h6v2z"/></svg>
+                        </div>
+                        <h3 class="card-title">Cho Cửa Hàng (Partner Vendor)</h3>
+                        <ul style="list-style: none; font-size: 0.9rem; color: var(--text-sub); line-height: 1.8;">
+                            <li>✓ Tiếp cận lượng khách du lịch lớn tại Vũng Tàu & Đà Nẵng.</li>
+                            <li>✓ Lấp đầy lịch xe, thuật toán tự chặn không nhận trùng lịch thuê.</li>
+                            <li>✓ Giảm thiểu rủi ro nhờ quy trình xét duyệt bằng lái chuẩn hóa.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SLIDE 4: 5 NHÓM NGƯỜI DÙNG -->
+            <section class="slide" data-slide="4">
+                <div class="slide-header">
+                    <span class="slide-subtitle">03. Đối tượng sử dụng</span>
+                    <h2 class="slide-title">5 Nhóm Người Dùng Hệ Thống</h2>
+                </div>
+                <div class="grid-5">
+                    <div class="card card-compact">
+                        <span class="badge badge-primary">Role 01</span>
+                        <h3 class="card-title">Khách Thuê</h3>
+                        <p class="card-text"><strong>Mục tiêu:</strong> Tìm xe đúng hẹn & ngân sách, thủ tục nhanh trên mobile, an toàn tiền cọc, ký nhận số tiện lợi.</p>
+                    </div>
+                    <div class="card card-compact">
+                        <span class="badge badge-secondary">Role 02</span>
+                        <h3 class="card-title">Chủ Cửa Hàng</h3>
+                        <p class="card-text"><strong>Mục tiêu:</strong> Lấp đầy lịch xe (5–50 xe), tránh trùng đơn, theo dõi doanh thu và bảng đối soát theo tuần.</p>
+                    </div>
+                    <div class="card card-compact">
+                        <span class="badge badge-primary" style="background:#E3FCEF; color:#006644;">Role 03</span>
+                        <h3 class="card-title">Nhân Viên Shop</h3>
+                        <p class="card-text"><strong>Mục tiêu:</strong> Thao tác nhanh tại chỗ, chụp ảnh 6 góc xe, ghi nhận km/xăng và lập biên bản giao nhận số.</p>
+                    </div>
+                    <div class="card card-compact">
+                        <span class="badge badge-accent">Role 04</span>
+                        <h3 class="card-title">Vận Hành Viên</h3>
+                        <p class="card-text"><strong>Mục tiêu:</strong> Kiểm duyệt hồ sơ cửa hàng, xét duyệt GPLX của khách và phân xử khiếu nại dựa trên bằng chứng ảnh.</p>
+                    </div>
+                    <div class="card card-compact">
+                        <span class="badge badge-primary" style="background:#EAE6FF; color:#403294;">Role 05</span>
+                        <h3 class="card-title">Quản Trị Hệ Thống</h3>
+                        <p class="card-text"><strong>Mục tiêu:</strong> Cấu hình tham số sàn (hoa hồng 12%, thời gian giữ chỗ 30p, chính sách hủy) và giám sát KPI toàn sàn.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SLIDE 5: PHẠM VI DỰ ÁN & MVP -->
+            <section class="slide" data-slide="5">
+                <div class="slide-header">
+                    <span class="slide-subtitle">04. Scope Management</span>
+                    <h2 class="slide-title">Phạm Vi Phiên Bản MVP & Ngoài Phạm Vi</h2>
+                </div>
+                <div class="grid-2">
+                    <div class="card">
+                        <span class="badge badge-primary" style="margin-bottom: 12px; font-size: 0.8rem;">Trong Phạm Vi (In-Scope MVP)</span>
+                        <ul style="list-style: none; font-size: 0.88rem; color: var(--text-main); line-height: 2.1;">
+                            <li>✅ <strong>Nền tảng:</strong> Web Responsive tối ưu ưu tiên di động (Mobile First).</li>
+                            <li>✅ <strong>Địa bàn thử nghiệm:</strong> TP. Vũng Tàu và TP. Đà Nẵng.</li>
+                            <li>✅ <strong>Nghiệp vụ cốt lõi:</strong> Tìm kiếm, lọc xe, giữ chỗ 30 phút, cọc online 30%.</li>
+                            <li>✅ <strong>Biên bản bàn giao số:</strong> 6 góc ảnh hiện trạng, chữ ký số màn hình.</li>
+                            <li>✅ <strong>Đánh giá & Khiếu nại:</strong> Đánh giá 1–5 sao, mở khiếu nại trong 48 giờ.</li>
+                        </ul>
+                    </div>
+                    <div class="card" style="background: #FAFBFC; border: 1px dashed var(--border-color);">
+                        <span class="badge badge-accent" style="background: #FFEBE6; color: #BF2600; margin-bottom: 12px; font-size: 0.8rem;">Ngoài Phạm Vi MVP (Out-of-Scope)</span>
+                        <ul style="list-style: none; font-size: 0.88rem; color: var(--text-sub); line-height: 2.1;">
+                            <li>❌ Ứng dụng di động gốc (Native App iOS / Android).</li>
+                            <li>❌ Cho thuê ô tô, xe đạp hoặc phương tiện khác ngoài xe máy.</li>
+                            <li>❌ Chương trình khách hàng thân thiết, tích điểm, mã giảm giá.</li>
+                            <li>❌ Tích hợp bảo hiểm chuyến thuê bên ngoài.</li>
+                            <li>❌ Định vị GPS giám sát hành trình xe theo thời gian thực.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SLIDE 6: CHỨC NĂNG TRỌNG TÂM -->
+            <section class="slide" data-slide="6">
+                <div class="slide-header">
+                    <span class="slide-subtitle">05. Core Features</span>
+                    <h2 class="slide-title">Các Chức Năng Trọng Tâm Hệ Thống</h2>
+                </div>
+                <div class="grid-4">
+                    <div class="card">
+                        <div class="card-icon"><svg class="icon-svg" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></div>
+                        <h3 class="card-title" style="font-size: 1rem;">Tài Khoản & KYC</h3>
+                        <p class="card-text">Đăng ký OTP SMS, tải ảnh CCCD và GPLX A1+ trở lên để vận hành viên duyệt điều kiện thuê.</p>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon"><svg class="icon-svg" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg></div>
+                        <h3 class="card-title" style="font-size: 1rem;">Tìm Kiếm & Lọc Xe</h3>
+                        <p class="card-text">Lọc thông minh theo ngày nhận/trả xe, loại xe (số, ga, côn), khoảng giá và điểm đánh giá.</p>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon"><svg class="icon-svg" viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg></div>
+                        <h3 class="card-title" style="font-size: 1rem;">Giữ Chỗ & Đặt Cọc</h3>
+                        <p class="card-text">Tự động khóa xe 30 phút, thanh toán 30% tiền cọc qua cổng thanh toán, phát hành biên nhận điện tử.</p>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon"><svg class="icon-svg" viewBox="0 0 24 24"><path d="M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.89-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg></div>
+                        <h3 class="card-title" style="font-size: 1rem;">Biên Bản Số & Đối Chiếu</h3>
+                        <p class="card-text">Chụp 6 ảnh góc xe, ghi số km/nhiên liệu, ký chữ ký số và đối chiếu song song lúc trả xe.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SLIDE 7: QUY TRÌNH ĐẶT XE & THANH TOÁN -->
+            <section class="slide" data-slide="7">
+                <div class="slide-header">
+                    <span class="slide-subtitle">06. Luồng nghiệp vụ</span>
+                    <h2 class="slide-title">Quy Trình Tìm Kiếm & Đặt Thuê Xe</h2>
+                </div>
+                <div class="process-flow">
+                    <div class="flow-step">
+                        <div>
+                            <div class="flow-step-num">1</div>
+                            <div class="flow-step-title">Tìm & Chọn Xe</div>
+                            <div class="flow-step-desc">Khách chọn điểm đến (Vũng Tàu / Đà Nẵng) và lịch thuê (tối thiểu 4h - tối đa 30 ngày).</div>
+                        </div>
+                    </div>
+                    <div class="flow-arrow">➔</div>
+                    <div class="flow-step">
+                        <div>
+                            <div class="flow-step-num">2</div>
+                            <div class="flow-step-title">Giữ Chỗ 30 Phút</div>
+                            <div class="flow-step-desc">Hệ thống khóa xe 30 phút để khách thực hiện thanh toán cọc, chống trùng đơn 100%.</div>
+                        </div>
+                    </div>
+                    <div class="flow-arrow">➔</div>
+                    <div class="flow-step">
+                        <div>
+                            <div class="flow-step-num">3</div>
+                            <div class="flow-step-title">Thanh Toán Cọc 30%</div>
+                            <div class="flow-step-desc">Thanh toán cọc trực tuyến (200k – 1 triệu đồng). Phần tiền còn lại trả khi nhận xe.</div>
+                        </div>
+                    </div>
+                    <div class="flow-arrow">➔</div>
+                    <div class="flow-step">
+                        <div>
+                            <div class="flow-step-num">4</div>
+                            <div class="flow-step-title">Cửa Hàng Duyệt</div>
+                            <div class="flow-step-desc">Cửa hàng có 15 phút để xác nhận hoặc từ chối đơn. Quá hạn chuyển vận hành viên xử lý.</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SLIDE 8: GIAO NHẬN XE & BIÊN BẢN -->
+            <section class="slide" data-slide="8">
+                <div class="slide-header">
+                    <span class="slide-subtitle">07. Bàn giao & Kiểm soát</span>
+                    <h2 class="slide-title">Biên Bản Số & Đối Chiếu Hình Ảnh Trước/Sau</h2>
+                </div>
+                <div class="grid-2">
+                    <div class="card">
+                        <h3 class="card-title">Quy Trình Chuẩn Bàn Giao (FR-26 $\rightarrow$ FR-29)</h3>
+                        <ol style="padding-left: 20px; font-size: 0.88rem; color: var(--text-sub); line-height: 2;">
+                            <li>Khách đến nhận xe xuất trình CCCD & GPLX gốc để nhân viên đối chiếu.</li>
+                            <li><strong>Chụp tối thiểu 6 ảnh theo góc quy định</strong> (Trước, sau, 2 bên sườn, số km & mức xăng).</li>
+                            <li>Hai bên bấm <strong>ký xác nhận điện tử</strong> trên màn hình web để kích hoạt đơn.</li>
+                            <li><strong>Khi trả xe:</strong> Hệ thống <strong>hiển thị song song ảnh giao & nhận</strong> để đối soát hư hỏng ngay tại chỗ.</li>
+                        </ol>
+                    </div>
+                    <div class="card" style="background: var(--secondary-light); border-color: rgba(0,184,217,0.3); justify-content: center; text-align: center;">
+                        <span class="badge badge-secondary" style="margin-bottom: 8px;">Hiệu Quả Kiểm Soát</span>
+                        <div style="font-size: 3rem; font-weight: 800; color: var(--secondary); line-height: 1.1; margin-bottom: 8px;">&lt; 3%</div>
+                        <h3 class="card-title" style="color: var(--dark); font-size: 1.05rem;">Tỷ Lệ Tranh Chấp Trả Xe</h3>
+                        <p class="card-text" style="font-size: 0.85rem; max-width: 380px; margin: 0 auto;">Nhờ minh chứng 6 ảnh đối chiếu song song và chữ ký số xác nhận, mọi hư hỏng mới đều có cơ sở phân định bồi thường minh bạch.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SLIDE 9: QUY TẮC NGHIỆP VỤ CHÍNH -->
+            <section class="slide" data-slide="9">
+                <div class="slide-header">
+                    <span class="slide-subtitle">08. Business Rules</span>
+                    <h2 class="slide-title">Quy Tắc Nghiệp Vụ Then Chốt (BR-01 $\rightarrow$ BR-10)</h2>
+                </div>
+                <div class="grid-3" style="grid-template-rows: repeat(2, 1fr); gap: 14px;">
+                    <div class="rule-item">
+                        <div class="rule-icon">🛡️</div>
+                        <div class="rule-content">
+                            <h4>Điều Kiện Thuê (BR-01, 02)</h4>
+                            <p>Đủ <strong>18 tuổi</strong>, có GPLX A1+ hợp lệ. Thuê tối thiểu <strong>4h</strong>, tối đa <strong>30 ngày</strong>.</p>
+                        </div>
+                    </div>
+                    <div class="rule-item">
+                        <div class="rule-icon">💵</div>
+                        <div class="rule-content">
+                            <h4>Tiền Cọc (BR-03)</h4>
+                            <p>Cọc <strong>30%</strong> tổng tiền thuê (Giới hạn: Min <strong>200.000đ</strong> – Max <strong>1.000.000đ</strong>).</p>
+                        </div>
+                    </div>
+                    <div class="rule-item">
+                        <div class="rule-icon">🔄</div>
+                        <div class="rule-content">
+                            <h4>Chính Sách Hủy (BR-04)</h4>
+                            <p>Hủy $\ge 24$h hoàn <strong>100%</strong>; 6h–24h hoàn <strong>50%</strong>; dưới 6h <strong>mất cọc</strong>.</p>
+                        </div>
+                    </div>
+                    <div class="rule-item">
+                        <div class="rule-icon">⏱️</div>
+                        <div class="rule-content">
+                            <h4>Trả Trễ Xe (BR-05)</h4>
+                            <p>Trễ &lt; 60p: <strong>Miễn phí</strong>. Từ 60p: phạt <strong>20% giá ngày/mỗi giờ trễ</strong>.</p>
+                        </div>
+                    </div>
+                    <div class="rule-item">
+                        <div class="rule-icon">🧼</div>
+                        <div class="rule-content">
+                            <h4>Đệm Bảo Dưỡng (BR-07)</h4>
+                            <p>Giữa 2 đơn của cùng 1 xe phải có <strong>tối thiểu 60 phút</strong> để vệ sinh & kiểm tra xe.</p>
+                        </div>
+                    </div>
+                    <div class="rule-item">
+                        <div class="rule-icon">🤝</div>
+                        <div class="rule-content">
+                            <h4>Hoa Hồng & Kỷ Luật (BR-08, 09)</h4>
+                            <p>Hoa hồng sàn <strong>12%</strong>. Tạm khóa gian hàng nếu tỷ lệ shop tự hủy vượt <strong>20%</strong>.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SLIDE 10: VÒNG ĐỜI TRẠNG THÁI ĐƠN THUÊ -->
+            <section class="slide" data-slide="10">
+                <div class="slide-header">
+                    <span class="slide-subtitle">09. State Lifecycle</span>
+                    <h2 class="slide-title">Vòng Đời Trạng Thái Của Đơn Thuê Xe</h2>
+                </div>
+                <div class="state-flow">
+                    <div class="state-box">
+                        <div>
+                            <span class="state-num">01. Khởi tạo</span>
+                            <div class="state-name">Chờ thanh toán</div>
+                            <div class="state-desc">Khách đặt đơn, hệ thống giữ chỗ xe 30 phút.</div>
+                        </div>
+                        <div class="state-condition">Cọc online thành công ➔</div>
+                    </div>
+                    <div class="state-box">
+                        <div>
+                            <span class="state-num">02. Xét duyệt</span>
+                            <div class="state-name">Chờ shop xác nhận</div>
+                            <div class="state-desc">Cửa hàng có 15 phút để chấp nhận hoặc từ chối đơn.</div>
+                        </div>
+                        <div class="state-condition">Cửa hàng xác nhận ➔</div>
+                    </div>
+                    <div class="state-box">
+                        <div>
+                            <span class="state-num">03. Chuẩn bị</span>
+                            <div class="state-name">Đã xác nhận</div>
+                            <div class="state-desc">Đơn được chốt, sẵn sàng giao xe tại điểm hẹn.</div>
+                        </div>
+                        <div class="state-condition">Ký biên bản giao 6 ảnh ➔</div>
+                    </div>
+                    <div class="state-box highlight">
+                        <div>
+                            <span class="state-num" style="background:#E3FCEF; color:#006644;">04. Vận hành</span>
+                            <div class="state-name">Đang thuê</div>
+                            <div class="state-desc">Khách nhận xe và đang trong hành trình du lịch.</div>
+                        </div>
+                        <div class="state-condition">Trả xe & đối chiếu ảnh ➔</div>
+                    </div>
+                    <div class="state-box">
+                        <div>
+                            <span class="state-num">05. Thanh toán</span>
+                            <div class="state-name">Chờ tất toán</div>
+                            <div class="state-desc">Đối chiếu ảnh trả xe, tính phí phát sinh (nếu có).</div>
+                        </div>
+                        <div class="state-condition">Tất toán đầy đủ ➔</div>
+                    </div>
+                    <div class="state-box" style="border-top-color: #36B37E;">
+                        <div>
+                            <span class="state-num" style="background:#E3FCEF; color:#006644;">06. Kết thúc</span>
+                            <div class="state-name">Hoàn tất</div>
+                            <div class="state-desc">Đánh giá 1–5 sao. Mở khiếu nại trong 48h nếu phát sinh.</div>
+                        </div>
+                        <div class="state-condition" style="color: #36B37E;">Đóng hồ sơ đơn ✔</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SLIDE 11: KẾ HOẠCH SCRUM & LÀM RÕ YÊU CẦU -->
+            <section class="slide" data-slide="11">
+                <div class="slide-header">
+                    <span class="slide-subtitle">10. Agile Execution</span>
+                    <h2 class="slide-title">Kế Hoạch 5 Sprint & Điểm Làm Rõ Nghiệp Vụ</h2>
+                </div>
+                <div class="grid-2">
+                    <div class="card">
+                        <h3 class="card-title" style="margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between;">
+                            <span>Lộ Trình 5 Sprint (2 Tuần/Sprint)</span>
+                            <span class="badge badge-primary">10 Tuần MVP</span>
+                        </h3>
+                        <div class="sprint-list">
+                            <div class="sprint-row">
+                                <span class="sprint-tag">Sprint 1</span>
+                                <div class="sprint-detail">Xác thực OTP, Hồ sơ KYC GPLX & Đăng ký Gian hàng</div>
+                            </div>
+                            <div class="sprint-row">
+                                <span class="sprint-tag">Sprint 2</span>
+                                <div class="sprint-detail">Quản lý kho xe, Lịch tuần & Cấu hình giá ngày/lễ</div>
+                            </div>
+                            <div class="sprint-row">
+                                <span class="sprint-tag">Sprint 3</span>
+                                <div class="sprint-detail">Tìm kiếm thông minh, Bộ lọc xe, Giữ chỗ 30p & Cọc 30%</div>
+                            </div>
+                            <div class="sprint-row">
+                                <span class="sprint-tag">Sprint 4</span>
+                                <div class="sprint-detail">Biên bản bàn giao số 6 ảnh & Ký điện tử giao/nhận</div>
+                            </div>
+                            <div class="sprint-row">
+                                <span class="sprint-tag">Sprint 5</span>
+                                <div class="sprint-detail">Đánh giá sao, Xử lý khiếu nại 48h & Đối soát hoa hồng 12%</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card" style="background: #FAFBFC;">
+                        <h3 class="card-title" style="margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between;">
+                            <span>Chủ Động Làm Rõ Với Khách Hàng (Mục 7.3)</span>
+                            <span class="badge badge-accent">Agile Discovery</span>
+                        </h3>
+                        <div class="clarify-card">
+                            <div class="clarify-q">❓ Thuê nhiều xe trong cùng 1 đơn?</div>
+                            <div class="clarify-a">👉 <strong>Giả định MVP:</strong> Giới hạn 1 xe/đơn để kiểm soát KYC và cọc chính xác.</div>
+                        </div>
+                        <div class="clarify-card">
+                            <div class="clarify-q">❓ Cửa hàng tự đặt mức cọc riêng?</div>
+                            <div class="clarify-a">👉 <strong>Giả định MVP:</strong> Cố định chuẩn 30% (200k – 1tr) để khách an tâm so sánh.</div>
+                        </div>
+                        <div class="clarify-card">
+                            <div class="clarify-q">❓ Khách không đến nhận xe mà không báo?</div>
+                            <div class="clarify-a">👉 <strong>Giả định MVP:</strong> Quá giờ hẹn 2 tiếng không liên lạc được thì hủy & mất cọc.</div>
+                        </div>
+                        <div class="clarify-card">
+                            <div class="clarify-q">❓ Nhắn tin trực tiếp giữa khách & chủ trên web?</div>
+                            <div class="clarify-a">👉 <strong>Giả định MVP:</strong> Liên hệ qua Hotline/Zalo; phát triển chat in-app sau MVP.</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SLIDE 12: MỤC TIÊU KINH DOANH -->
+            <section class="slide" data-slide="12">
+                <div class="slide-header">
+                    <span class="slide-subtitle">11. Business Metrics</span>
+                    <h2 class="slide-title">Mục Tiêu Kinh Doanh & KPI Dự Án</h2>
+                </div>
+                <div class="grid-3">
+                    <div class="metric-card">
+                        <div class="badge badge-primary">Quy mô 6 tháng đầu</div>
+                        <div class="metric-number">30 / 400</div>
+                        <div class="metric-label">Cửa hàng & Đầu xe</div>
+                        <div class="metric-sub">Phủ rộng tại Vũng Tàu và Đà Nẵng</div>
+                    </div>
+                    <div class="metric-card" style="border-top-color: var(--secondary);">
+                        <div class="badge badge-secondary">Tối ưu trải nghiệm</div>
+                        <div class="metric-number">&lt; 5m</div>
+                        <div class="metric-label">Thời gian đặt xe</div>
+                        <div class="metric-sub">Từ bước tìm kiếm đến đặt cọc thành công</div>
+                    </div>
+                    <div class="metric-card" style="border-top-color: var(--accent);">
+                        <div class="badge badge-accent">Chất lượng dịch vụ</div>
+                        <div class="metric-number">&lt; 3%</div>
+                        <div class="metric-label">Tỷ lệ tranh chấp</div>
+                        <div class="metric-sub">Giải quyết nhờ đối chiếu ảnh 6 góc</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SLIDE 13: LỜI KẾT & Q&A -->
+            <section class="slide slide-closing" data-slide="13">
+                <div class="cover-content" style="max-width: 850px; margin: 0 auto; z-index: 2;">
+                    <span class="cover-tag" style="background: rgba(255,255,255,0.18); color: #ffffff; border: 1px solid rgba(255,255,255,0.35); padding: 8px 20px; border-radius: 30px; font-weight: 700; letter-spacing: 1.5px; font-size: 0.85rem;">
+                        TỔNG KẾT BÁO CÁO • AGILE SCRUM
+                    </span>
+                    <h1 class="cover-title" style="font-size: 3.5rem; margin-top: 24px; margin-bottom: 20px; color: #FFFFFF; font-weight: 800; line-height: 1.2;">
+                        Cảm Ơn Các Bạn Đã Lắng Nghe!
+                    </h1>
+                    <p class="cover-desc" style="color: #DEEBFF; max-width: 760px; margin: 0 auto 28px auto; line-height: 1.6; font-size: 1.15rem;">
+                        MotoGo hướng tới giải pháp công nghệ toàn diện cho thị trường thuê xe máy du lịch tự lái — Minh bạch, Nhanh gọn và An toàn cho cả Khách thuê lẫn Cửa hàng đối tác.
+                    </p>
+                    <div style="display: flex; justify-content: center; gap: 16px; margin-bottom: 28px; flex-wrap: wrap;">
+                        <span style="background: rgba(255,255,255,0.15); padding: 8px 18px; border-radius: 20px; color: #ffffff; font-size: 0.85rem; font-weight: 600;">👥 Nhóm 4 Đẹp Trai</span>
+                        <span style="background: rgba(255,255,255,0.15); padding: 8px 18px; border-radius: 20px; color: #ffffff; font-size: 0.85rem; font-weight: 600;">📖 IT206 — Agile Scrum</span>
+                        <span style="background: rgba(255,255,255,0.15); padding: 8px 18px; border-radius: 20px; color: #ffffff; font-size: 0.85rem; font-weight: 600;">🚀 Mini Project MVP 1.0</span>
+                    </div>
+                    <div>
+                        <span style="display: inline-block; background: rgba(255, 255, 255, 0.22); padding: 14px 36px; border-radius: 30px; color: #ffffff; font-weight: 700; font-size: 1.15rem; border: 1px solid rgba(255,255,255,0.45); box-shadow: 0 8px 24px rgba(0,0,0,0.25);">
+                            💬 Q&A — Rất Mong Nhận Được Đóng Góp & Câu Hỏi!
+                        </span>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- PROGRESS BAR -->
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+
+        <!-- BOTTOM CONTROL BAR -->
+        <footer class="bottom-navbar">
+            <div class="slide-counter">
+                Slide <span class="current" id="current-slide">1</span> / <span id="total-slides">13</span>
+            </div>
+            
+            <div class="controls">
+                <button class="ctrl-btn" id="btn-prev" title="Slide trước (Mũi tên trái)">
+                    <svg class="icon-svg" viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+                </button>
+                <button class="ctrl-btn" id="btn-next" title="Slide tiếp (Mũi tên phải / Spacebar)">
+                    <svg class="icon-svg" viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+                </button>
+            </div>
+        </footer>
+
+        <!-- DRAWER OVERVIEW PANEL -->
+        <aside class="overview-drawer" id="overview-drawer">
+            <div class="drawer-header">
+                <span>Danh Mục Slide</span>
+                <button id="btn-close-drawer" style="background:none; border:none; cursor:pointer; font-weight:700; font-size:1.2rem; color:var(--text-sub);">✕</button>
+            </div>
+            <div class="drawer-content" id="drawer-thumbnails">
+                <!-- Javascript will generate thumbnails here -->
+            </div>
+        </aside>
+
+        <!-- KEYBOARD HINT TOAST -->
+        <div class="kbd-hint">Dùng phím <kbd>←</kbd> <kbd>→</kbd> hoặc <kbd>Space</kbd> để chuyển slide</div>
+    </div>
+
+    <!-- ==========================================================================
+       5. JAVASCRIPT APP LOGIC
+       ========================================================================== -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // State variables
+            let currentSlideIndex = 0;
+            const slides = document.querySelectorAll('.slide');
+            const totalSlides = slides.length;
+
+            // DOM Elements
+            const currentSlideEl = document.getElementById('current-slide');
+            const totalSlidesEl = document.getElementById('total-slides');
+            const progressBar = document.getElementById('progress-bar');
+            const btnPrev = document.getElementById('btn-prev');
+            const btnNext = document.getElementById('btn-next');
+            const btnFullscreen = document.getElementById('btn-fullscreen');
+            const btnToggleOverview = document.getElementById('btn-toggle-overview');
+            const btnCloseDrawer = document.getElementById('btn-close-drawer');
+            const overviewDrawer = document.getElementById('overview-drawer');
+            const drawerThumbnails = document.getElementById('drawer-thumbnails');
+            const stage = document.getElementById('stage');
+
+            // Initialize Presentation
+            function init() {
+                totalSlidesEl.textContent = totalSlides;
+                generateThumbnails();
+                updateSlideView();
+            }
+
+            // Update View state
+            function updateSlideView() {
+                slides.forEach((slide, idx) => {
+                    slide.classList.remove('active', 'prev');
+                    if (idx === currentSlideIndex) {
+                        slide.classList.add('active');
+                    } else if (idx < currentSlideIndex) {
+                        slide.classList.add('prev');
+                    }
+                });
+
+                // Update Counters & Progress Bar
+                currentSlideEl.textContent = currentSlideIndex + 1;
+                const progressPercent = ((currentSlideIndex + 1) / totalSlides) * 100;
+                progressBar.style.width = `${progressPercent}%`;
+
+                // Update Control Buttons state
+                btnPrev.disabled = currentSlideIndex === 0;
+                btnNext.disabled = currentSlideIndex === totalSlides - 1;
+
+                // Update Thumbnail Drawer active status
+                const thumbs = drawerThumbnails.querySelectorAll('.thumb-item');
+                thumbs.forEach((thumb, idx) => {
+                    if (idx === currentSlideIndex) {
+                        thumb.classList.add('active');
+                    } else {
+                        thumb.classList.remove('active');
+                    }
+                });
+            }
+
+            // Navigation Actions
+            function goToNextSlide() {
+                if (currentSlideIndex < totalSlides - 1) {
+                    currentSlideIndex++;
+                    updateSlideView();
+                }
+            }
+
+            function goToPrevSlide() {
+                if (currentSlideIndex > 0) {
+                    currentSlideIndex--;
+                    updateSlideView();
+                }
+            }
+
+            function goToSlide(index) {
+                if (index >= 0 && index < totalSlides) {
+                    currentSlideIndex = index;
+                    updateSlideView();
+                    overviewDrawer.classList.remove('open');
+                }
+            }
+
+            // Generate Drawer Thumbnails
+            function generateThumbnails() {
+                drawerThumbnails.innerHTML = '';
+                slides.forEach((slide, idx) => {
+                    const titleEl = slide.querySelector('.slide-title') || slide.querySelector('.cover-title');
+                    let titleText = titleEl ? titleEl.textContent.trim() : `Slide ${idx + 1}`;
+                    
+                    const item = document.createElement('div');
+                    item.className = `thumb-item ${idx === 0 ? 'active' : ''}`;
+                    item.innerHTML = `
+                        <span class="thumb-num">${idx + 1}.</span>
+                        <span class="thumb-title">${titleText}</span>
+                    `;
+                    item.addEventListener('click', () => goToSlide(idx));
+                    drawerThumbnails.appendChild(item);
+                });
+            }
+
+            // Fullscreen Handler
+            function toggleFullscreen() {
+                if (!document.fullscreenElement) {
+                    if (stage.requestFullscreen) {
+                        stage.requestFullscreen();
+                    } else if (stage.webkitRequestFullscreen) {
+                        stage.webkitRequestFullscreen();
+                    }
+                } else {
+                    if (document.exitFullscreen) {
+                        document.exitFullscreen();
+                    }
+                }
+            }
+
+            // Event Listeners
+            btnNext.addEventListener('click', goToNextSlide);
+            btnPrev.addEventListener('click', goToPrevSlide);
+            btnFullscreen.addEventListener('click', toggleFullscreen);
+
+            btnToggleOverview.addEventListener('click', () => {
+                overviewDrawer.classList.toggle('open');
+            });
+
+            btnCloseDrawer.addEventListener('click', () => {
+                overviewDrawer.classList.remove('open');
+            });
+
+            // Keyboard Navigation (Arrow Keys & Spacebar)
+            document.addEventListener('keydown', (e) => {
+                // Do not trigger if typing in an input field (if any added)
+                if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+                if (e.key === 'ArrowRight' || e.key === ' ') {
+                    e.preventDefault();
+                    goToNextSlide();
+                } else if (e.key === 'ArrowLeft') {
+                    e.preventDefault();
+                    goToPrevSlide();
+                } else if (e.key === 'Escape') {
+                    overviewDrawer.classList.remove('open');
+                }
+            });
+
+            // Touch Swipe Support for Mobile/Tablet
+            let touchStartX = 0;
+            let touchEndX = 0;
+
+            slidesContainer = document.getElementById('slides-container');
+            slidesContainer.addEventListener('touchstart', (e) => {
+                touchStartX = e.changedTouches[0].screenX;
+            }, { passive: true });
+
+            slidesContainer.addEventListener('touchend', (e) => {
+                touchEndX = e.changedTouches[0].screenX;
+                handleSwipe();
+            }, { passive: true });
+
+            function handleSwipe() {
+                const swipeThreshold = 50;
+                if (touchEndX < touchStartX - swipeThreshold) {
+                    goToNextSlide(); // Swipe Left -> Next
+                }
+                if (touchEndX > touchStartX + swipeThreshold) {
+                    goToPrevSlide(); // Swipe Right -> Prev
+                }
+            }
+
+            // Initialize app
+            init();
+        });
+    </script>
+</body>
+</html>
